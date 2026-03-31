@@ -1,0 +1,30 @@
+# config.yaml
+defaults:
+  compression: "snappy"
+  chunk_size: 100000
+
+paths:
+  base_dir: "data"
+  raw_dir: "${paths.base_dir}/raw"
+  staging_dir: "${paths.base_dir}/staging"
+  output_dir: "${paths.base_dir}/processed"
+
+datasets:
+  yelp:
+    base_dir: "${paths.raw_dir}/Yelp JSON/yelp_dataset"
+    business:
+      raw_file: "yelp_academic_dataset_business.json"
+      output_file: "yelp_business.parquet"
+      columns_to_keep: ["business_id", "name", "city", "state", "stars", "review_count", "categories"]
+      processing:
+        chunk_size: 50000  
+        sample_pct: 1.0    
+    
+    review:
+      raw_file: "yelp_academic_dataset_review.json"
+      output_file: "yelp_reviews_silver.parquet"
+      columns_to_keep: ["business_id", "stars", "text", "date"]
+      processing:
+        chunk_size: 250000 
+        sample_pct: 0.2    
+        max_records: 1000000

@@ -1,0 +1,8 @@
+pandas
+pyarrow
+omegaconf
+kaggle
+jupyter
+notebook
+rapidfuzz
+python-dotenv
