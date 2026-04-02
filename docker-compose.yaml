@@ -22,12 +22,13 @@ services:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      # THIS INSTALLS YOUR LIBS AUTOMATICALLY
-      - _PIP_ADDITIONAL_REQUIREMENTS=omegaconf pandas pyarrow
+      - _PIP_ADDITIONAL_REQUIREMENTS=-r /opt/airflow/requirements.txt
     volumes:
       - ./dags:/opt/airflow/dags
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
+      - ./kaggle.json:/home/airflow/.kaggle/kaggle.json
+      - ./requirements.txt:/opt/airflow/requirements.txt
 
   webserver:
     image: apache/airflow:2.7.1

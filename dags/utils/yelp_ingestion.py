@@ -13,7 +13,7 @@ def validate_raw_yelp_data(config):
 def clean_and_parquet_yelp_data(config):
     biz_cfg = config.datasets.yelp.business
 
-    output_path = os.path.join(config.paths.staging_dir, biz_cfg.output_file)
+    output_path = os.path.join(config.paths.staging_dir, biz_cfg.staging_file)
     input_path = os.path.join(config.datasets.yelp.base_dir, config.datasets.yelp.business.raw_file)
     columns_to_keep = biz_cfg.columns_to_keep
 
@@ -24,7 +24,7 @@ def clean_and_parquet_yelp_data(config):
         for i, chunk in enumerate(reader):
             
                 
-            chunk = chunk[chunk['is_open'] == 1]                        # Filter for open businesses
+            # chunk = chunk[chunk['is_open'] == 1]                        # Filter for open businesses
             chunk = chunk[columns_to_keep]                              # Select columns to keep
             chunk['city'] = chunk['city'].str.upper().str.strip()       # Format city to uppercase
             chunk['state'] = chunk['state'].str.upper().str.strip()     # Format state to uppercase

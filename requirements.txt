@@ -6,3 +6,4 @@ jupyter
 notebook
 rapidfuzz
 python-dotenv
+kaggle

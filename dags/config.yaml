@@ -14,7 +14,7 @@ datasets:
     base_dir: "${paths.raw_dir}/Yelp JSON/yelp_dataset"
     business:
       raw_file: "yelp_academic_dataset_business.json"
-      output_file: "yelp_business.parquet"
+      staging_file: "yelp_business.parquet"
       columns_to_keep: ["business_id", "name", "city", "state", "stars", "review_count", "categories", "postal_code"]
       processing:
         chunk_size: 50000  
@@ -22,9 +22,19 @@ datasets:
     
     review:
       raw_file: "yelp_academic_dataset_review.json"
-      output_file: "yelp_reviews_silver.parquet"
+      staging_file: "yelp_reviews_silver.parquet"
       columns_to_keep: ["business_id", "stars", "text", "date"]
       processing:
         chunk_size: 250000 
         sample_pct: 0.2    
         max_records: 1000000
+  
+  demographics:
+    kaggle_id: "mexwell/us-cities-demographics"
+    base_dir: "${paths.raw_dir}/demographics"
+    raw_file: "us-cities-demographics.csv" 
+    staging_file: "demographics_silver.parquet"
+    columns_to_keep: ["city", "state_code", "median_age", "total_population", "average_household_size"]
+
+  joined:
+    staging_file: "yelp_demographics_joined.parquet"

@@ -2,3 +2,5 @@ data/raw/*
 data/processed/*
 data/staging/*
 logs/*
+*/__pycache__/*
+logs/*
