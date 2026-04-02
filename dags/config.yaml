@@ -15,7 +15,7 @@ datasets:
     business:
       raw_file: "yelp_academic_dataset_business.json"
       output_file: "yelp_business.parquet"
-      columns_to_keep: ["business_id", "name", "city", "state", "stars", "review_count", "categories"]
+      columns_to_keep: ["business_id", "name", "city", "state", "stars", "review_count", "categories", "postal_code"]
       processing:
         chunk_size: 50000  
         sample_pct: 1.0    

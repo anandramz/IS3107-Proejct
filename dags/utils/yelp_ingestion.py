@@ -30,8 +30,15 @@ def clean_and_parquet_yelp_data(config):
             chunk['state'] = chunk['state'].str.upper().str.strip()     # Format state to uppercase
             chunk['stars'] = chunk['stars'].astype(float)               # Ensure stars is float
             chunk['review_count'] = chunk['review_count'].astype(int)   # Ensure stars is float
-            chunk['postal_code'] = chunk['postal_code'].astype(int)     # Ensure postal_code is int
+            
+            # Force to string first to handle any mixed types/NaNs
+            chunk['postal_code'] = chunk['postal_code'].astype(str).str.strip()
+            is_numeric = chunk['postal_code'].str.match(r'^\d+$')
+            chunk = chunk[is_numeric]
+            chunk['postal_code'] = chunk['postal_code'].astype(int)
+
             # Convert categories from csv string to list
+            chunk['categories'] = chunk['categories'].fillna('')
             chunk['categories'] = chunk['categories'].apply(lambda x: [i.strip() for i in x.split(',')])
 
             table = pa.Table.from_pandas(chunk)
