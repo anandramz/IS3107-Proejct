@@ -7,3 +7,4 @@ notebook
 rapidfuzz
 python-dotenv
 kaggle
+scikit-learn
