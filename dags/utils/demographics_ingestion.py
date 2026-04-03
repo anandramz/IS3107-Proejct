@@ -3,9 +3,6 @@ import os
 from kaggle.api.kaggle_api_extended import KaggleApi
 import pyarrow as pa
 import pyarrow.parquet as pq
-import logging
-
-logger = logging.getLogger(__name__)
 
 def download_dataset_from_kaggle(config):
     dataset_identifier = config.datasets.demographics.kaggle_id

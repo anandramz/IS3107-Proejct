@@ -4,10 +4,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from omegaconf import OmegaConf
 from airflow.decorators import dag, task
-from utils.data_join import join_yelp_and_demographics_data
+from utils.data_join import join_yelp_and_irs_data, join_yelp_irs_and_demographics_data
 import pendulum
 from utils.yelp_ingestion import validate_raw_yelp_data, clean_and_parquet_yelp_data
 from utils.demographics_ingestion import ingest_demographics_to_silver, download_dataset_from_kaggle
+from utils.irs_ingestion import validate_raw_irs_data, ingest_irs_to_silver
 
 # --- HELPER FUNCTIONS ---
 def get_config():
@@ -42,8 +43,21 @@ def main_dag():
         ingest_demographics_to_silver(config)
 
     @task
-    def join_data_silver():
-        join_yelp_and_demographics_data(config)
+    def validate_irs_bronze():
+        validate_raw_irs_data(config)
+    
+    @task
+    def stage_irs_silver():
+        ingest_irs_to_silver(config)
+
+    @task
+    def join_yelp_irs_silver():
+        join_yelp_and_irs_data(config)
+
+    @task
+    def join_yelp_irs_demographics_silver():
+        join_yelp_irs_and_demographics_data(config)
+
 
     validate_yelp = validate_yelp_bronze()
     validate_demographics = validate_demographics_bronze()
@@ -51,10 +65,17 @@ def main_dag():
     stage_yelp = stage_yelp_silver()
     stage_demographics = stage_demographics_silver()
 
-    join = join_data_silver()
+    validate_irs = validate_irs_bronze()
+    stage_irs = stage_irs_silver()
+
+    join_yelp_irs = join_yelp_irs_silver()
+    join_yelp_irs_demographics = join_yelp_irs_demographics_silver()
 
     validate_yelp >> stage_yelp                     # Branch 1: Yelp
-    validate_demographics >> stage_demographics     # Branch 2: Demographics
-    [stage_yelp, stage_demographics] >> join
+    validate_irs >> stage_irs                       # Branch 2: IRS
+    validate_demographics >> stage_demographics     # Branch 3: Demographics
+    
+    [stage_yelp, stage_irs] >> join_yelp_irs                            # Join Yelp and IRS first
+    [join_yelp_irs, stage_demographics] >> join_yelp_irs_demographics   # Then join with Demographics
     
 dag = main_dag()

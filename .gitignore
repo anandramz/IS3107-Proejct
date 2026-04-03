@@ -2,5 +2,7 @@ data/raw/*
 data/processed/*
 data/staging/*
 logs/*
-*/__pycache__/*
+__pycache__/
+*.py[cod]
 logs/*
+.DS_Store

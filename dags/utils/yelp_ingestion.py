@@ -32,10 +32,9 @@ def clean_and_parquet_yelp_data(config):
             chunk['review_count'] = chunk['review_count'].astype(int)   # Ensure stars is float
             
             # Force to string first to handle any mixed types/NaNs
-            chunk['postal_code'] = chunk['postal_code'].astype(str).str.strip()
+            chunk['postal_code'] = chunk['postal_code'].astype(str).str.zfill(5)
             is_numeric = chunk['postal_code'].str.match(r'^\d+$')
             chunk = chunk[is_numeric]
-            chunk['postal_code'] = chunk['postal_code'].astype(int)
 
             # Convert categories from csv string to list
             chunk['categories'] = chunk['categories'].fillna('')
