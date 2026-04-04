@@ -39,7 +39,7 @@ def ingest_irs_to_silver(config):
     
     pivot_agi_marriage_ratio_df = df.pivot_table(index='postal_code', columns='agi_stub', values='marriage_ratio').fillna(0).reset_index()
     pivot_agi_marriage_ratio_df.columns = [
-        'postal_code',          # keep postal_code for merging
+        'postal_code',                   # keep postal_code for merging
         'marriage_ratio_under_25k',      # agi_stub 1
         'marriage_ratio_25k_to_50k',     # agi_stub 2
         'marriage_ratio_50k_to_75k',     # agi_stub 3
@@ -48,7 +48,14 @@ def ingest_irs_to_silver(config):
         'marriage_ratio_over_200k',      # agi_stub 6
     ]
 
-    final_df = agi_ratio_df.merge(pivot_agi_marriage_ratio_df, on='postal_code', how='inner')
+    total_individuals_df = (
+        df.groupby('postal_code', as_index=False)['n2']
+        .sum()
+        .rename(columns={'n2': 'total_individuals'})
+    )
+
+    final_df = agi_ratio_df.merge(pivot_agi_marriage_ratio_df, on='postal_code', how='inner') \
+                .merge(total_individuals_df, on='postal_code', how='inner')
 
 
     # Save to Parquet
