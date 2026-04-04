@@ -36,7 +36,7 @@ datasets:
     # n1: number of (tax) returns
     # n2: number of individuals
     # mars2: # of joint returns
-    columns_to_keep: ["zipcode", "agi_stub", "n1", "n2", "mars2"]
+    columns_to_keep: ["zipcode", "state", "agi_stub", "n1", "n2", "mars2"]
 
   yelp_irs:
     staging_file: "yelp_irs_joined.parquet"
