@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def cluster_zip_codes(config):
 
-    joined_data_path = os.path.join(config.paths.staging_dir, config.datasets.yelp_irs_demographics.staging_file)
+    joined_data_path = os.path.join(config.paths.staging_dir, config.datasets.yelp_irs.staging_file)
     output_path = os.path.join(config.paths.staging_dir, config.ml.cluster_staging_file)
     df = pd.read_parquet(joined_data_path)
     
@@ -38,7 +38,7 @@ def cluster_zip_codes(config):
 
 def generate_opportunity_mart(config):
     clustered_zips_path = os.path.join(config.paths.staging_dir, config.ml.cluster_staging_file)
-    joined_data_path = os.path.join(config.paths.staging_dir, config.datasets.yelp_irs_demographics.staging_file)
+    joined_data_path = os.path.join(config.paths.staging_dir, config.datasets.yelp_irs.staging_file)
     
     # Load data
     zip_profiles = pd.read_parquet(clustered_zips_path)

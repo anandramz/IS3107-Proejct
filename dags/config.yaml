@@ -21,13 +21,6 @@ datasets:
         chunk_size: 50000  
         sample_pct: 1.0    
   
-  demographics:
-    kaggle_id: "mexwell/us-cities-demographics"
-    base_dir: "${paths.raw_dir}/demographics"
-    raw_file: "us-cities-demographics.csv" 
-    staging_file: "demographics_silver.parquet"
-    columns_to_keep: ["city", "state_code", "median_age", "total_population", "average_household_size"]
-
   irs:
     base_dir: "${paths.raw_dir}/zipcode2022"
     raw_file: "22zpallagi.csv"
@@ -41,12 +34,8 @@ datasets:
   yelp_irs:
     staging_file: "yelp_irs_joined.parquet"
 
-  yelp_irs_demographics:
-    staging_file: "yelp_irs_demographics_joined.parquet"
-  
 ml:
   cluster_features: [
-    'median_age', 'total_population', 'average_household_size',
     'ratio_under_25k', 'ratio_25k_to_50k', 'ratio_50k_to_75k', 'ratio_75k_to_100k', 
     'ratio_100k_to_200k', 'ratio_over_200k', 
     'marriage_ratio_under_25k', 'marriage_ratio_25k_to_50k', 'marriage_ratio_50k_to_75k', 
