@@ -15,6 +15,7 @@ datasets:
     business:
       raw_file: "yelp_academic_dataset_business.json"
       staging_file: "yelp_business.parquet"
+      map_file: "yelp_city_zip_consensus.parquet"
       columns_to_keep: ["business_id", "name", "city", "state", "stars", "review_count", "categories", "postal_code"]
       processing:
         chunk_size: 50000  

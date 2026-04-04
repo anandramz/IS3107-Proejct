@@ -18,17 +18,23 @@ def ingest_irs_to_silver(config):
     
     df = pd.read_csv(input_path, sep=',', engine='python')
     df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+
+    location_index = ['postal_code', 'state']
     
     df = df[columns_to_keep]
     # Standardize Values
     df['postal_code'] = df['zipcode'].astype(str).str.zfill(5)
+
+    excluded_zips = ['00000', '99999']
+    df = df[~df['postal_code'].isin(excluded_zips)]
     df['marriage_ratio'] = 2*df['mars2'].astype(float) / df['n2'].astype(float)
 
-    pivot_agi_df = df.pivot_table(index='postal_code', columns='agi_stub', values='n1').fillna(0)
+    pivot_agi_df = df.pivot_table(index=location_index, columns='agi_stub', values='n1').fillna(0)
     total_households = pivot_agi_df.sum(axis=1)
     agi_ratio_df = pivot_agi_df.div(total_households, axis=0).reset_index()
     agi_ratio_df.columns = [
         'postal_code',          # keep postal_code for merging
+        'state',                # keep state for merging
         'ratio_under_25k',      # agi_stub 1
         'ratio_25k_to_50k',     # agi_stub 2
         'ratio_50k_to_75k',     # agi_stub 3
@@ -37,9 +43,10 @@ def ingest_irs_to_silver(config):
         'ratio_over_200k',      # agi_stub 6
     ]
     
-    pivot_agi_marriage_ratio_df = df.pivot_table(index='postal_code', columns='agi_stub', values='marriage_ratio').fillna(0).reset_index()
+    pivot_agi_marriage_ratio_df = df.pivot_table(index=location_index, columns='agi_stub', values='marriage_ratio').fillna(0).reset_index()
     pivot_agi_marriage_ratio_df.columns = [
         'postal_code',                   # keep postal_code for merging
+        'state',                         # keep state for merging   
         'marriage_ratio_under_25k',      # agi_stub 1
         'marriage_ratio_25k_to_50k',     # agi_stub 2
         'marriage_ratio_50k_to_75k',     # agi_stub 3
@@ -49,14 +56,13 @@ def ingest_irs_to_silver(config):
     ]
 
     total_individuals_df = (
-        df.groupby('postal_code', as_index=False)['n2']
+        df.groupby(location_index, as_index=False)['n2']
         .sum()
         .rename(columns={'n2': 'total_individuals'})
     )
 
-    final_df = agi_ratio_df.merge(pivot_agi_marriage_ratio_df, on='postal_code', how='inner') \
-                .merge(total_individuals_df, on='postal_code', how='inner')
-
+    final_df = agi_ratio_df.merge(pivot_agi_marriage_ratio_df, on=location_index, how='inner') \
+                .merge(total_individuals_df, on=location_index, how='inner')
 
     # Save to Parquet
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

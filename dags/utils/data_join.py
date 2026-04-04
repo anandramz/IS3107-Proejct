@@ -13,9 +13,10 @@ def join_yelp_and_irs_data(config):
     yelp = pd.read_parquet(yelp_path)
     irs = pd.read_parquet(irs_path)
 
-    # Join data on postal code
-    joined = yelp.merge(irs, on='postal_code', how='inner')
+    # Join data on postal code and state
+    joined = yelp.merge(irs, on=['postal_code', 'state'], how='inner')
     assert not joined['postal_code'].isnull().any(), "Join resulted in missing postal codes!" 
+    assert not joined['state'].isnull().any(), "Join resulted in missing states!"
 
     joined.to_parquet(output_path, index=False)
 

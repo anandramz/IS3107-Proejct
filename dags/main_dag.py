@@ -6,7 +6,7 @@ from omegaconf import OmegaConf
 from airflow.decorators import dag, task
 from utils.data_join import join_yelp_and_irs_data, join_yelp_irs_and_demographics_data
 import pendulum
-from utils.yelp_ingestion import validate_raw_yelp_data, clean_and_parquet_yelp_data
+from utils.yelp_ingestion import validate_raw_yelp_data, clean_and_parquet_yelp_data, build_consensus_map
 from utils.demographics_ingestion import ingest_demographics_to_silver, download_dataset_from_kaggle
 from utils.irs_ingestion import validate_raw_irs_data, ingest_irs_to_silver
 from utils.ml import cluster_zip_codes, generate_opportunity_mart
@@ -30,6 +30,10 @@ def main_dag():
     @task
     def validate_yelp_bronze():
         validate_raw_yelp_data(config)
+
+    @task
+    def build_consensus_map_task():
+        build_consensus_map(config)
 
     @task
     def stage_yelp_silver():
@@ -71,6 +75,7 @@ def main_dag():
     validate_yelp = validate_yelp_bronze()
     validate_demographics = validate_demographics_bronze()
 
+    build_consensus_map_yelp = build_consensus_map_task()
     stage_yelp = stage_yelp_silver()
     stage_demographics = stage_demographics_silver()
 
@@ -83,9 +88,9 @@ def main_dag():
     cluster_zip = cluster_zip_codes_gold()
     generate_marts = generate_opportunity_mart_gold()
 
-    validate_yelp >> stage_yelp                     # Branch 1: Yelp
-    validate_irs >> stage_irs                       # Branch 2: IRS
-    validate_demographics >> stage_demographics     # Branch 3: Demographics
+    validate_yelp >> build_consensus_map_yelp >> stage_yelp # Branch 1: Yelp
+    validate_irs >> stage_irs                               # Branch 2: IRS
+    validate_demographics >> stage_demographics             # Branch 3: Demographics
     
     [stage_yelp, stage_irs] >> join_yelp_irs                           
     [join_yelp_irs, stage_demographics] \
